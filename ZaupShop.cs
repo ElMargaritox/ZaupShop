@@ -7,8 +7,8 @@ using Rocket.Unturned.Chat;
 using Rocket.Unturned.Player;
 using SDG.Unturned;
 using UnityEngine;
-using ZaupShop.Groups;
-using GroupManager = ZaupShop.Groups.GroupManager;
+
+
 using Logger = Rocket.Core.Logging.Logger;
 
 namespace ZaupShop

@@ -5,7 +5,7 @@ using fr34kyn01535.Uconomy;
 using I18N.West;
 using MySql.Data.MySqlClient;
 using Rocket.Core.Logging;
-using ZaupShop.Groups;
+
 
 namespace ZaupShop
 {
@@ -168,143 +168,16 @@ namespace ZaupShop
             return num;
         }
 
-        public bool AddGroup(ZaupGroup group)
-        {
-            byte mySQLBool = group.Whitelist ? (byte) 1 : (byte) 0;
-            string commandText =
-                $"Insert into `{ZaupShop.Instance.GroupListTableName}` (`name`, `whitelist`) VALUES (@name, '{mySQLBool}');";
 
-            var rowsObject = ExecuteQuery(false, commandText, new MySqlParameter("@name", group.Name));
 
-            if (rowsObject == null)
-                return false;
 
-            byte newRows = byte.Parse(rowsObject.ToString());
 
-            commandText =
-                $"CREATE TABLE `{group.Name}` (`id` smallint UNSIGNED NOT NULL AUTO_INCREMENT, `assetid` smallint UNSIGNED NOT NULL, `vehicle` tinyint NOT NULL, PRIMARY KEY (`id`))";
 
-            ExecuteQuery(false, commandText);
 
-            return newRows == 1;
-        }
 
-        public bool DelGroup(string groupName)
-        {
-            string commandText =
-                $"DELETE FROM `{ZaupShop.Instance.GroupListTableName}` WHERE `name` = @name;";
 
-            var rowsObject = ExecuteQuery(false, commandText, new MySqlParameter("@name", groupName));
 
-            if (rowsObject == null)
-                return false;
 
-            byte goneRows = byte.Parse(rowsObject.ToString());
-
-            commandText = $"DROP TABLE `{groupName}`;";
-            
-            ExecuteQuery(false, commandText);
-
-            return goneRows == 1;
-        }
-
-        public bool AddIDToGroup(ZaupGroup group, ZaupGroupElement element)
-        {
-            byte mySQLBool = element.Vehicle ? (byte) 1 : (byte) 0;
-            string commandText = $"INSERT INTO `{group.Name}` (`assetid`, `vehicle`) VALUES ('{element.ID}', '{mySQLBool}');";
-
-            var rowsObject = ExecuteQuery(false, commandText);
-
-            if (rowsObject == null)
-                return false;
-            
-            byte newRows = byte.Parse(rowsObject.ToString());
-
-            return newRows == 1;
-        }
-
-        public bool RemoveIDFromGroup(ZaupGroup group, ZaupGroupElement element)
-        {
-            byte mySQLBool = element.Vehicle ? (byte) 1 : (byte) 0;
-            string commandText = $"DELETE FROM `{group.Name}` WHERE `assetid` = '{element.ID}' AND `vehicle` = '{mySQLBool}';";
-
-            var rowsObject = ExecuteQuery(false, commandText);
-
-            if (rowsObject == null)
-                return false;
-            
-            byte goneRows = byte.Parse(rowsObject.ToString());
-
-            return goneRows == 1;
-        }
-
-        public HashSet<ZaupGroup> GetGroups()
-        {
-            string query = $"SELECT * FROM `{ZaupShop.Instance.GroupListTableName}`;";
-            return _GetGroups(query);
-        }
-
-        private HashSet<ZaupGroup> _GetGroups(string query)
-        {
-            HashSet<ZaupGroup> groups = new HashSet<ZaupGroup>();
-
-            using MySqlConnection connection = CreateConnection();
-            try
-            {
-                using MySqlCommand command = connection.CreateCommand();
-                command.CommandText = query;
-
-                connection.Open();
-                using MySqlDataReader reader = command.ExecuteReader();
-                
-                while (reader.Read())
-                {
-                    string groupName = reader.GetString(0);
-                    bool wlist = reader.GetBoolean(1);
-                    groups.Add(new ZaupGroup(groupName, wlist, new HashSet<ZaupGroupElement>()));
-                }
-            }
-            catch (Exception ex)
-            {
-                Logger.LogException(ex);
-            }
-
-            return groups;
-        }
-
-        public HashSet<ZaupGroupElement> GetGroupElements(string groupName)
-        {
-            string query = $"SELECT * FROM `{groupName}`;";
-            return _GetGroupElements(query);
-        }
-
-        private HashSet<ZaupGroupElement> _GetGroupElements(string query)
-        {
-            HashSet<ZaupGroupElement> groupElements = new HashSet<ZaupGroupElement>();
-
-            using MySqlConnection connection = CreateConnection();
-            try
-            {
-                using MySqlCommand command = connection.CreateCommand();
-                command.CommandText = query;
-
-                connection.Open();
-                using MySqlDataReader reader = command.ExecuteReader();
-                
-                while (reader.Read())
-                {
-                    ushort ID = reader.GetUInt16(1);
-                    bool vehicle = reader.GetBoolean(2);
-                    groupElements.Add(new ZaupGroupElement(ID, vehicle));
-                }
-            }
-            catch (Exception ex)
-            {
-                Logger.LogException(ex);
-            }
-
-            return groupElements;
-        }
 
         /// <summary>
         /// Executes a MySql query.

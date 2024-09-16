@@ -6,7 +6,7 @@ using Rocket.Core.Logging;
 using Rocket.Unturned.Chat;
 using Rocket.Unturned.Player;
 using SDG.Unturned;
-using ZaupShop.Groups;
+
 
 namespace ZaupShop.Commands
 {
@@ -296,110 +296,26 @@ namespace ZaupShop.Commands
 
                     string groupName = command[2];
                     string groupType = command[3];
-                    ZaupGroup group;
-                    ZaupGroupElement element;
+          
                     
                     switch (groupType)
                     {
-                        case "wlist":
-                            group = new ZaupGroup(groupName, true);
-                            if (!ZaupShop.Instance.ShopDB.AddGroup(group))
-                            {
-                                SendMessage(caller, "shop_group_create_failed", groupName);
-                                return;
-                            }
-
-                            ZaupShop.Instance.GroupManager.Groups.Add(group);
-                            SendMessage(caller, "shop_group_created", groupName, groupType);
-                            return;
-                        case "blist":
-                            group = new ZaupGroup(groupName, false);
-                            if (!ZaupShop.Instance.ShopDB.AddGroup(group))
-                            {
-                                SendMessage(caller, "shop_group_create_failed", groupName);
-                                return;
-                            }
-
-                            ZaupShop.Instance.GroupManager.Groups.Add(group);
-                            SendMessage(caller, "shop_group_created", groupName, groupType);
-                            return;
                         default:
                             SendMessage(caller, "shop_group_create_usage");
                             return;
                     }
                 case "delgroup":
-                    if (command.Length != 3)
-                    {
-                        SendMessage(caller, "shop_group_del_usage");
-                        return;
-                    }
-
-                    groupName = command[2];
-
-                    int goneGroups = ZaupShop.Instance.GroupManager.Groups.RemoveWhere(x => x.Name == groupName);
-
-                    if (goneGroups != 1)
-                    {
-                        SendMessage(caller, "shop_group_delete_failed", groupName);
-                        return;
-                    }
-
-                    if (!ZaupShop.Instance.ShopDB.DelGroup(groupName))
-                    {
-                        SendMessage(caller, "shop_group_delete_failed", groupName);
-                        return;
-                    }
                     
-                    SendMessage(caller, "shop_group_deleted", groupName);
                     return;
                 case "add":
                     groupName = command[2];
 
-                    group = ZaupShop.Instance.GroupManager.Groups.FirstOrDefault(x => x.Name == groupName);
-
-                    if (group == null)
-                    {
-                        SendMessage(caller, "shop_group_add_failed", ID, groupName);
-                        return;
-                    }
-                    
-                    element = new ZaupGroupElement(ID, vehicle);
-                    if (!ZaupShop.Instance.ShopDB.AddIDToGroup(group, element))
-                    {
-                        SendMessage(caller, "shop_group_add_failed", ID, groupName);
-                        return;
-                    }
-
-                    group.Elements.Add(element);
-                    SendMessage(caller, "shop_group_added_id", ID, groupName);
+                 
                     return;
                 case "rem":
                     groupName = command[2];
                     
-                    group = ZaupShop.Instance.GroupManager.Groups.FirstOrDefault(x => x.Name == groupName);
 
-                    if (group == null)
-                    {
-                        SendMessage(caller, "shop_group_remove_failed", ID, groupName);
-                        return;
-                    }
-
-                    element = group.Elements.FirstOrDefault(x => x.ID == ID && x.Vehicle == vehicle);
-
-                    if (element == null)
-                    {
-                        SendMessage(caller, "shop_group_remove_failed", ID, groupName);
-                        return;
-                    }
-                    
-                    if (!ZaupShop.Instance.ShopDB.RemoveIDFromGroup(group, element))
-                    {
-                        SendMessage(caller, "shop_group_remove_failed", ID, groupName);
-                        return;
-                    }
-
-                    group.Elements.Remove(element);
-                    SendMessage(caller, "shop_group_removed_id", ID, groupName);
                     return;
                 default:
                     SendMessage(caller, "shop_group_usage");
