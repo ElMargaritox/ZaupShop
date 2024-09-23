@@ -23,7 +23,7 @@ namespace ZaupShop.Databases
         internal DatabaseManagerVehicleShop()
         {
             System.IO.Directory.CreateDirectory($"{Environment.CurrentDirectory}/Plugins/ZaupShop/Database");
-            this.VehicleShopStorage = new DataStorage<List<VehicleShop>>(ZaupShop.Instance.Directory + "/Database", "ItemShopStorage.json");
+            this.VehicleShopStorage = new DataStorage<List<VehicleShop>>(ZaupShop.Instance.Directory + "/Database", "ItemVehicleStorage.json");
             Logger.Log("Loading json... OK  [VEHICLE SHOP STORAGE]");
             CheckSchema();
         }
